@@ -56,144 +56,108 @@
 <body>
 
   <div class="card">
-    <h1>Temukan Hobi Spesifik Kamu</h1>
-    <div id="questionBox" class="question">Apakah kamu suka aktivitas fisik?</div>
+    <h1>Temukan Hobi Kamu</h1>
+    <div id="questionBox" class="question"></div>
     <button class="btn" onclick="jawab('iya')">Iya</button>
     <button class="btn" onclick="jawab('tidak')">Tidak</button>
+    <button class="btn" onclick="jawab('sendiri')">Sendiri</button>
+    <button class="btn" onclick="jawab('berkelompok')">Berkelompok</button>
     <div id="hasil" class="result"></div>
   </div>
 
   <script>
-    let langkah = 0;
+    const tree = {
+      question: "Apakah kamu suka aktivitas fisik?",
+      iya: {
+        question: "Apakah kamu suka di luar ruangan?",
+        iya: {
+          question: "Apakah kamu lebih suka sendiri atau berkelompok?",
+          sendiri: {
+            question: "Apakah kamu suka tantangan ekstrem?",
+            iya: { result: "Panjat Tebing" },
+            tidak: { result: "Hiking" }
+          },
+          berkelompok: {
+            question: "Apakah kamu suka olahraga kompetitif?",
+            iya: { result: "Sepak Bola" },
+            tidak: { result: "Zumba Outdoor" }
+          }
+        },
+        tidak: {
+          question: "Apakah kamu suka alat bantu seperti beban?",
+          iya: { result: "Fitness" },
+          tidak: { result: "Yoga" }
+        }
+      },
+      tidak: {
+        question: "Apakah kamu suka menciptakan sesuatu?",
+        iya: {
+          question: "Apakah kamu suka seni visual?",
+          iya: {
+            question: "Apakah kamu lebih suka media digital?",
+            iya: { result: "Desain Grafis" },
+            tidak: { result: "Melukis" }
+          },
+          tidak: {
+            question: "Apakah kamu suka menulis cerita?",
+            iya: { result: "Menulis Cerpen" },
+            tidak: { result: "Kerajinan Tangan" }
+          }
+        },
+        tidak: {
+          question: "Apakah kamu suka musik?",
+          iya: {
+            question: "Apakah kamu suka alat musik?",
+            iya: { result: "Bermain Gitar" },
+            tidak: { result: "Bernyanyi" }
+          },
+          tidak: {
+            question: "Apakah kamu suka belajar hal baru secara mandiri?",
+            iya: {
+              question: "Apakah kamu tertarik dengan komputer?",
+              iya: { result: "Ngoding" },
+              tidak: { result: "Membaca Buku" }
+            },
+            tidak: { result: "Menonton Film" }
+          }
+        }
+      }
+    };
 
-    function jawab(jawaban) {
+    let currentNode = tree;
+
+    function updateUI() {
       const box = document.getElementById('questionBox');
       const hasil = document.getElementById('hasil');
-
-      switch (langkah) {
-        case 0:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu suka aktivitas di luar ruangan?';
-            langkah = 1;
-          } else {
-            box.innerText = 'Apakah kamu suka membuat atau menciptakan sesuatu?';
-            langkah = 5;
-          }
-          break;
-
-        // Fisik
-        case 1:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu suka olahraga yang memacu adrenalin?';
-            langkah = 2;
-          } else {
-            box.innerText = 'Apakah kamu suka latihan dengan alat bantu seperti mesin atau beban?';
-            langkah = 3;
-          }
-          break;
-
-        case 2:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu suka memanjat atau menaklukkan ketinggian?';
-            langkah = 11;
-          } else {
-            box.innerText = 'Apakah kamu menikmati berjalan atau berlari jarak jauh?';
-            langkah = 12;
-          }
-          break;
-
-        case 11:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Panjat Tebing</b>';
-          selesai();
-          break;
-
-        case 12:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Lari Maraton</b>';
-          selesai();
-          break;
-
-        case 3:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu menyukai lingkungan gym dan rutinitas latihan teratur?';
-            langkah = 4;
-          } else {
-            box.innerText = 'Apakah kamu lebih suka aktivitas yang menenangkan dan fokus pada keseimbangan tubuh?';
-            langkah = 13;
-          }
-          break;
-
-        case 4:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Fitness/Gym</b>';
-          selesai();
-          break;
-
-        case 13:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Yoga</b>';
-          selesai();
-          break;
-
-        // Non-fisik: kreatif dan logika
-        case 5:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu suka menggambar atau membuat seni visual?';
-            langkah = 6;
-          } else {
-            box.innerText = 'Apakah kamu suka mendengarkan musik atau bernyanyi?';
-            langkah = 8;
-          }
-          break;
-
-        case 6:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu lebih suka media digital dibanding kertas?';
-            langkah = 7;
-          } else {
-            hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Menulis Cerita</b>';
-            selesai();
-          }
-          break;
-
-        case 7:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Desain Grafis</b>';
-          selesai();
-          break;
-
-        case 8:
-          if (jawaban === 'iya') {
-            box.innerText = 'Apakah kamu suka memainkan alat musik?';
-            langkah = 9;
-          } else {
-            box.innerText = 'Apakah kamu suka belajar sesuatu yang baru secara mandiri?';
-            langkah = 10;
-          }
-          break;
-
-        case 9:
-          hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Bermain Gitar</b>';
-          selesai();
-          break;
-
-        case 10:
-          box.innerText = 'Apakah kamu suka komputer dan teknologi?';
-          langkah = 14;
-          break;
-
-        case 14:
-          if (jawaban === 'iya') {
-            hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Ngoding</b>';
-          } else {
-            hasil.innerHTML = '🌟 Hobi kamu adalah: <b>Membaca Buku</b>';
-          }
-          selesai();
-          break;
+      if (currentNode.result) {
+        box.style.display = 'none';
+        document.querySelectorAll('.btn').forEach(btn => btn.style.display = 'none');
+        hasil.innerHTML = `🌟 Hobi kamu adalah: <b>${currentNode.result}</b>`;
+      } else {
+        box.innerText = currentNode.question;
+        showButtons(Object.keys(currentNode).filter(k => k !== 'question'));
       }
     }
 
-    function selesai() {
-      document.getElementById('questionBox').style.display = 'none';
-      const buttons = document.querySelectorAll('.btn');
-      buttons.forEach(btn => btn.style.display = 'none');
+    function showButtons(options) {
+      document.querySelectorAll('.btn').forEach(btn => {
+        if (options.includes(btn.innerText.toLowerCase())) {
+          btn.style.display = 'inline-block';
+        } else {
+          btn.style.display = 'none';
+        }
+      });
     }
+
+    function jawab(jawaban) {
+      if (currentNode[jawaban]) {
+        currentNode = currentNode[jawaban];
+        updateUI();
+      }
+    }
+
+    // Inisialisasi tampilan awal
+    updateUI();
   </script>
 
 </body>
