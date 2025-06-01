@@ -1,164 +1,219 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pohon Keputusan Hobi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0fdfd;
-      padding: 30px;
-      text-align: center;
-    }
-
-    .card {
-      background: white;
-      padding: 25px;
-      max-width: 600px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      color: #008080;
-    }
-
-    .question {
-      font-size: 18px;
-      margin: 20px 0;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      background-color: #009999;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn:hover {
-      background-color: #007777;
-    }
-
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-left: 5px solid #009999;
-      background: #e0f7f7;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Decision Tree ID3 - Klasifikasi Hobi</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0fdfd;
+    padding: 30px;
+    text-align: center;
+  }
+  .card {
+    background: white;
+    padding: 25px;
+    max-width: 600px;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #008080;
+  }
+  .question {
+    font-size: 18px;
+    margin: 20px 0;
+  }
+  .btn {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    background-color: #009999;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background-color: #007777;
+  }
+  .result {
+    margin-top: 20px;
+    padding: 15px;
+    border-left: 5px solid #009999;
+    background: #e0f7f7;
+    font-weight: bold;
+  }
+</style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>Temukan Hobi Kamu</h1>
-    <div id="questionBox" class="question"></div>
-    <button class="btn" onclick="jawab('iya')">Iya</button>
-    <button class="btn" onclick="jawab('tidak')">Tidak</button>
-    <button class="btn" onclick="jawab('sendiri')">Sendiri</button>
-    <button class="btn" onclick="jawab('berkelompok')">Berkelompok</button>
-    <div id="hasil" class="result"></div>
-  </div>
+<div class="card">
+  <h1>Temukan Hobi Kamu </h1>
+  <div id="questionBox" class="question"></div>
+  <div id="answerButtons"></div>
+  <div id="hasil" class="result"></div>
+</div>
 
-  <script>
-    const tree = {
-      question: "Apakah kamu suka aktivitas fisik?",
-      iya: {
-        question: "Apakah kamu suka di luar ruangan?",
-        iya: {
-          question: "Apakah kamu lebih suka sendiri atau berkelompok?",
-          sendiri: {
-            question: "Apakah kamu suka tantangan ekstrem?",
-            iya: { result: "Panjat Tebing" },
-            tidak: { result: "Hiking" }
-          },
-          berkelompok: {
-            question: "Apakah kamu suka olahraga kompetitif?",
-            iya: { result: "Sepak Bola" },
-            tidak: { result: "Zumba Outdoor" }
-          }
-        },
-        tidak: {
-          question: "Apakah kamu suka alat bantu seperti beban?",
-          iya: { result: "Fitness" },
-          tidak: { result: "Yoga" }
-        }
-      },
-      tidak: {
-        question: "Apakah kamu suka menciptakan sesuatu?",
-        iya: {
-          question: "Apakah kamu suka seni visual?",
-          iya: {
-            question: "Apakah kamu lebih suka media digital?",
-            iya: { result: "Desain Grafis" },
-            tidak: { result: "Melukis" }
-          },
-          tidak: {
-            question: "Apakah kamu suka menulis cerita?",
-            iya: { result: "Menulis Cerpen" },
-            tidak: { result: "Kerajinan Tangan" }
-          }
-        },
-        tidak: {
-          question: "Apakah kamu suka musik?",
-          iya: {
-            question: "Apakah kamu suka alat musik?",
-            iya: { result: "Bermain Gitar" },
-            tidak: { result: "Bernyanyi" }
-          },
-          tidak: {
-            question: "Apakah kamu suka belajar hal baru secara mandiri?",
-            iya: {
-              question: "Apakah kamu tertarik dengan komputer?",
-              iya: { result: "Ngoding" },
-              tidak: { result: "Membaca Buku" }
-            },
-            tidak: { result: "Menonton Film" }
-          }
-        }
-      }
+<script>
+// Dataset dengan 10 atribut + label hobi
+const dataset = [
+  { fisik: "iya", luar: "iya", kelompok: "tidak", ekstrem: "iya", seni: "tidak", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Panjat Tebing" },
+  { fisik: "iya", luar: "iya", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Hiking" },
+  { fisik: "iya", luar: "iya", kelompok: "iya", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Zumba Outdoor" },
+  { fisik: "iya", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Yoga" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "iya", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "iya", tulis: "tidak", label: "Desain Grafis" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "iya", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "iya", label: "Menulis Cerpen" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "iya", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Bernyanyi" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "iya", komputer: "iya", digital: "tidak", tulis: "tidak", label: "Ngoding" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "iya", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Membaca Buku" },
+  { fisik: "tidak", luar: "tidak", kelompok: "tidak", ekstrem: "tidak", seni: "tidak", musik: "tidak", mandiri: "tidak", komputer: "tidak", digital: "tidak", tulis: "tidak", label: "Menonton Film" },
+];
+
+// Pertanyaan untuk tiap atribut
+const questions = {
+  fisik: "Apakah kamu suka aktivitas fisik?",
+  luar: "Apakah kamu suka melakukan aktivitas di luar ruangan?",
+  kelompok: "Apakah kamu lebih suka berkelompok daripada sendiri?",
+  ekstrem: "Apakah kamu suka tantangan ekstrem?",
+  seni: "Apakah kamu suka seni visual?",
+  musik: "Apakah kamu suka musik?",
+  mandiri: "Apakah kamu suka belajar hal baru secara mandiri?",
+  komputer: "Apakah kamu tertarik dengan komputer?",
+  digital: "Apakah kamu suka menggunakan media digital?",
+  tulis: "Apakah kamu suka menulis cerita atau artikel?",
+};
+
+// Fungsi untuk menghitung entropy
+function entropy(data) {
+  const total = data.length;
+  const counts = {};
+  data.forEach(item => {
+    counts[item.label] = (counts[item.label] || 0) + 1;
+  });
+  let ent = 0;
+  for (const label in counts) {
+    const p = counts[label] / total;
+    ent -= p * Math.log2(p);
+  }
+  return ent;
+}
+
+// Fungsi untuk menghitung information gain dari suatu atribut
+function informationGain(data, attribute) {
+  const totalEntropy = entropy(data);
+  const total = data.length;
+  
+  // Kelompokkan data berdasarkan nilai atribut
+  const subsets = {};
+  data.forEach(item => {
+    const attrVal = item[attribute];
+    if (!subsets[attrVal]) subsets[attrVal] = [];
+    subsets[attrVal].push(item);
+  });
+  
+  // Hitung weighted entropy
+  let subsetEntropy = 0;
+  for (const subset in subsets) {
+    const subsetData = subsets[subset];
+    subsetEntropy += (subsetData.length / total) * entropy(subsetData);
+  }
+  
+  return totalEntropy - subsetEntropy;
+}
+
+// Fungsi ID3: buat pohon keputusan
+function id3(data, attributes) {
+  // Jika semua data punya label sama, return leaf node
+  const labels = [...new Set(data.map(d => d.label))];
+  if (labels.length === 1) {
+    return { result: labels[0] };
+  }
+  
+  // Jika atribut habis, return leaf node dengan label paling banyak
+  if (attributes.length === 0) {
+    const counts = {};
+    data.forEach(d => {
+      counts[d.label] = (counts[d.label] || 0) + 1;
+    });
+    const maxLabel = Object.entries(counts).sort((a,b) => b[1]-a[1])[0][0];
+    return { result: maxLabel };
+  }
+  
+  // Pilih atribut terbaik berdasarkan info gain
+  let bestAttr = null;
+  let bestGain = -Infinity;
+  attributes.forEach(attr => {
+    const gain = informationGain(data, attr);
+    if (gain > bestGain) {
+      bestGain = gain;
+      bestAttr = attr;
+    }
+  });
+  
+  // Buat node pohon dengan atribut terbaik
+  const tree = { question: questions[bestAttr] };
+  
+  // Nilai atribut (misalnya "iya", "tidak")
+  const attrValues = [...new Set(data.map(d => d[bestAttr]))];
+  
+  attrValues.forEach(val => {
+    // Filter data subset
+    const subset = data.filter(d => d[bestAttr] === val);
+    // Hapus atribut yang sudah dipakai
+    const remainingAttrs = attributes.filter(a => a !== bestAttr);
+    // Rekursif bangun subtree
+    tree[val] = id3(subset, remainingAttrs);
+  });
+  
+  return tree;
+}
+
+// Build tree
+const attributes = Object.keys(questions);
+const decisionTree = id3(dataset, attributes);
+
+// State UI
+let currentNode = decisionTree;
+let answers = {};
+
+// Render question & buttons
+function renderQuestion(node) {
+  const questionBox = document.getElementById("questionBox");
+  const answerButtons = document.getElementById("answerButtons");
+  const hasil = document.getElementById("hasil");
+  
+  hasil.innerHTML = "";
+  
+  if (node.result) {
+    questionBox.innerText = "";
+    answerButtons.innerHTML = "";
+    hasil.innerHTML = `Hobi kamu adalah: <b>${node.result}</b>`;
+    return;
+  }
+  
+  questionBox.innerText = node.question;
+  
+  // Tampilkan opsi (keys kecuali 'question')
+  const options = Object.keys(node).filter(k => k !== "question");
+  answerButtons.innerHTML = "";
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+    btn.onclick = () => {
+      answers[node.question] = opt;
+      currentNode = node[opt];
+      renderQuestion(currentNode);
     };
+    answerButtons.appendChild(btn);
+  });
+}
 
-    let currentNode = tree;
-
-    function updateUI() {
-      const box = document.getElementById('questionBox');
-      const hasil = document.getElementById('hasil');
-      if (currentNode.result) {
-        box.style.display = 'none';
-        document.querySelectorAll('.btn').forEach(btn => btn.style.display = 'none');
-        hasil.innerHTML = `🌟 Hobi kamu adalah: <b>${currentNode.result}</b>`;
-      } else {
-        box.innerText = currentNode.question;
-        showButtons(Object.keys(currentNode).filter(k => k !== 'question'));
-      }
-    }
-
-    function showButtons(options) {
-      document.querySelectorAll('.btn').forEach(btn => {
-        if (options.includes(btn.innerText.toLowerCase())) {
-          btn.style.display = 'inline-block';
-        } else {
-          btn.style.display = 'none';
-        }
-      });
-    }
-
-    function jawab(jawaban) {
-      if (currentNode[jawaban]) {
-        currentNode = currentNode[jawaban];
-        updateUI();
-      }
-    }
-
-    // Inisialisasi tampilan awal
-    updateUI();
-  </script>
+// Mulai
+renderQuestion(currentNode);
+</script>
 
 </body>
 </html>
